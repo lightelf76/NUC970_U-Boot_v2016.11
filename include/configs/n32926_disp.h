@@ -28,7 +28,7 @@
 
 #define EXT_CLK	        12000000        /* 12 MHz crystal */
 
-#define CONFIG_SYS_TEXT_BASE		0x2000000
+#define CONFIG_SYS_TEXT_BASE		0x900000
 
 #define CONFIG_SYS_LOAD_ADDR            0x8000
 
@@ -42,6 +42,7 @@
 #define CONFIG_CMDLINE_TAG	1	/* enable passing of ATAGs	*/
 #define CONFIG_SETUP_MEMORY_TAGS 1
 #define CONFIG_INITRD_TAG	1
+
 
 /*#define CONFIG_NUC970_HW_CHECKSUM */
 
