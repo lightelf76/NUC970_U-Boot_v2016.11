@@ -69,7 +69,6 @@ int n32926_serial_init (void)
 {
 	/* setup multi-function pins PA10, PA11 to UART1 mode */
 	__raw_writel((__raw_readl(REG_MFP_GPA_H) & 0xffff00ff) | 0x3300, REG_MFP_GPA_H); 
-
 	/* UART1 line configuration for (n,8,2) */
 	UART1->LCR = WB_DATA_BITS_8 | WB_STOP_BITS_2 | WB_PARITY_NONE;
 	/* EXT_CLK/CONFIG_BAUDRATE = M * (BRD+2), where M=16 or DIV_X+1 or 1 */

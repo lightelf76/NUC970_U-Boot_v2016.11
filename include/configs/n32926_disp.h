@@ -73,7 +73,6 @@
 #define CONFIG_ETHADDR                  00:00:00:11:66:88
 #define CONFIG_SYS_RX_ETH_BUFFER        16 // default is 4, set to 16 here.
 
-
 /*#undef CONFIG_SYS_ICACHE_OFF */
 /*#undef CONFIG_SYS_DCACHE_OFF */
 /*#define CONFIG_SYS_ICACHE_OFF*/
