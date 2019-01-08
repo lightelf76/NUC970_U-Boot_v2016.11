@@ -56,6 +56,45 @@ void spi_init()
 	return;
 }
 
+int  spi_cs_is_valid(unsigned int bus, unsigned int cs)
+{
+	return(1);
+}
+
+void spi_cs_activate(struct spi_slave *slave)
+{
+	writel(readl(SPISSR) | SPI_SS_ACT, SPISSR);
+	return;
+}
+
+void spi_cs_deactivate(struct spi_slave *slave)
+{
+	writel(readl(SPISSR) & ~SPI_SS_ACT, SPISSR);
+	return;
+}
+
+
+void spi_set_speed(struct spi_slave *slave, uint hz)
+{
+	unsigned int div;
+
+	div = SPI_CLK / (hz * 2);
+
+	if((SPI_CLK % (hz * 2)) == 0)
+		div--;
+
+	if(div == 0)
+		div = 1;  // div should at lease be 1
+
+	if(div > 0xFFFF)
+		div = 0xFFFF; // 16 bits only
+
+	writel(div, SPIDIV);
+
+	return;
+}
+
+
 struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
                                   unsigned int max_hz, unsigned int mode) {
 	struct n32926_spi_slave  *ns;
@@ -88,7 +127,6 @@ void spi_free_slave(struct spi_slave *slave)
 
 int spi_claim_bus(struct spi_slave *slave)
 {
-	//char *cp;
 	struct n32926_spi_slave *ns = to_n32926_spi(slave);
 
 #ifdef USE_N32926_SPI0
@@ -123,9 +161,9 @@ int spi_claim_bus(struct spi_slave *slave)
 		writel(readl(SPICTL) & ~SPI_CLKPOL, SPICTL);
 
 	if(ns->mode & SPI_CPHA)
-		writel(readl(SPICTL) | SPI_CLKPHAINV, SPICTL);
-	else
 		writel(readl(SPICTL) | SPI_CLKPHA, SPICTL);
+	else
+		writel(readl(SPICTL) | SPI_CLKPHAINV, SPICTL);
 
 	spi_set_speed(slave, ns->max_hz);
 
@@ -183,10 +221,12 @@ int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
 
 	len = bitlen / 8;
 
+        while (readl(SPICTL) & SPI_BUSY);
+
 	if(flags & SPI_XFER_BEGIN) {
 		spi_cs_activate(slave);
 	}
-
+/*
 	// handle quad mode
 	if (flags & SPI_6WIRE) {
 		writel(readl(SPICTL) | SPI_QUAD_EN, SPICTL);
@@ -199,7 +239,7 @@ int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
 		writel(readl(SPICTL) & ~SPI_QUAD_EN, SPICTL);
 		//printf("QUAD=>(x)(0x%08x)\n", readl(SPICTL));
 	}
-
+*/
 	if (len > 65536) {
 		unsigned char NonAlignLen;
 		//process non-alignment case
@@ -230,14 +270,21 @@ int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
 			len -= NonAlignLen;
 		}
 
-		writel((readl(SPICTL) & ~SPI_BIT_MASK) | SPI_32BIT, SPICTL); //set bit length to 32 bits
+		writel((readl(SPICTL) & ~SPI_BIT_MASK) | SPI_32BIT | SPI_BYTE_SWAP, SPICTL); //set bit length to 32 bits
                 writel((readl(SPICTL) & ~SPI_TXN_MASK) | SPI_TXN4, SPICTL);  //set tx/rx number to 4 (SPI0/1/2/3)
 		for (i = 0; (i+16) <= len; i+=16) {
-			if(tx) {
+			if(tx) 
+                        {
+/*
 				writel_ESwap(*(unsigned int*)tx, SPITX0);
 				writel_ESwap(*(unsigned int*)(tx + 4), SPITX1);
 				writel_ESwap(*(unsigned int*)(tx + 8), SPITX2);
 				writel_ESwap(*(unsigned int*)(tx + 12), SPITX3);
+*/
+				writel(*(unsigned int*)tx, SPITX0);
+				writel(*(unsigned int*)(tx + 4), SPITX1);
+				writel(*(unsigned int*)(tx + 8), SPITX2);
+				writel(*(unsigned int*)(tx + 12), SPITX3);
 				tx += 16;
 			}
 
@@ -245,13 +292,20 @@ int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
 			while (readl(SPICTL) & SPI_BUSY);
 
 			if(rx) {
+/*
 				*(unsigned int*)rx = readl_ESwap(SPIRX0);
 				*(unsigned int*)(rx + 4) = readl_ESwap(SPIRX1);
 				*(unsigned int*)(rx + 8) = readl_ESwap(SPIRX2);
 				*(unsigned int*)(rx + 12) = readl_ESwap(SPIRX3);
+*/
+				*(unsigned int*)rx = readl(SPIRX0);
+				*(unsigned int*)(rx + 4) = readl(SPIRX1);
+				*(unsigned int*)(rx + 8) = readl(SPIRX2);
+				*(unsigned int*)(rx + 12) = readl(SPIRX3);
 				rx += 16;
 			}
 		}
+		writel(readl(SPICTL) & ~SPI_BYTE_SWAP, SPICTL);
 		//process rest bytes
 		if (i < len) {
 			writel((readl(SPICTL) & ~SPI_BIT_MASK) | SPI_8BIT, SPICTL); //set bit length to 8 bits
@@ -295,41 +349,4 @@ out:
 	return 0;
 }
 
-int  spi_cs_is_valid(unsigned int bus, unsigned int cs)
-{
-	return(1);
-}
-
-void spi_cs_activate(struct spi_slave *slave)
-{
-	writel(readl(SPISSR) | SPI_SS_ACT, SPISSR);
-	return;
-}
-
-void spi_cs_deactivate(struct spi_slave *slave)
-{
-	writel(readl(SPISSR) & ~SPI_SS_ACT, SPISSR);
-	return;
-}
-
-
-void spi_set_speed(struct spi_slave *slave, uint hz)
-{
-	unsigned int div;
-
-	div = SPI_CLK / (hz * 2);
-
-	if((SPI_CLK % (hz * 2)) == 0)
-		div--;
-
-	if(div == 0)
-		div = 1;  // div should at lease be 1
-
-	if(div > 0xFFFF)
-		div = 0xFFFF; // 16 bits only
-
-	writel(div, SPIDIV);
-
-	return;
-}
 
