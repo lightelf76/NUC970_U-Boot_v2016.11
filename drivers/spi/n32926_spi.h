@@ -38,6 +38,7 @@
 #define SPICTL         (SPI_BASE + 0x00)
 #define SPIDIV         (SPI_BASE + 0x04)
 #define SPISSR         (SPI_BASE + 0x08)
+#define SPIEDMA        (SPI_BASE + 0x18)
 #define SPIRX0         (SPI_BASE + 0x20)
 #define SPITX0         (SPI_BASE + 0x20)
 #define SPIRX1         (SPI_BASE + 0x24)
@@ -48,25 +49,26 @@
 #define SPITX3         (SPI_BASE + 0x2C)
 
 #define SPI_BUSY        0x00000001
-#define SPI_CLKPOL      0x00000800
-#define SPI_CLKPHAMSK   0x00000006
 #define SPI_CLKPHAINV   0x00000002
 #define SPI_CLKPHA      0x00000004
+#define SPI_CLKPHAMSK   0x00000006
 #define SPI_8BIT        0x00000040
 #define SPI_24BIT       0x000000C0
 #define SPI_32BIT       0x00000000
 #define SPI_BIT_MASK    0x000000F8
+#define SPI_DUAL_EN	0x00000100
+#define SPI_QUAD_EN	0x00000200
+#define SPI_CLKPOL      0x00000800
+#define SPI_BYTE_SWAP   0x00100000
 #define SPI_TXN1        0x00000000
 #define SPI_TXN4        0x00600000
 #define SPI_TXN_MASK    0x00E00000
-#define SPI_DUAL_EN	0x00000100
-#define SPI_QUAD_EN	0x00000200
 #define SPI_DIR_2QM	0x01000000
 
 #define SPI_SS_ACT      0x00000001
 #define SPI_SS_HIGH     0x00000004
 
-#define SPI_CLK         75000000        // From APB clock
+#define SPI_CLK         120000000        // From APB clock
 
 #define SPI_DUAL_MODE '2'
 #define SPI_QUAD_MODE '4'
