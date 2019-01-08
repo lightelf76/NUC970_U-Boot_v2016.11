@@ -84,4 +84,4 @@ static inline struct n32926_spi_slave *to_n32926_spi(struct spi_slave *slave)
         return container_of(slave, struct n32926_spi_slave, slave);
 }
 
-#endif //_NUC970_SPI_H_
+#endif //_N32926_SPI_H_
