@@ -136,6 +136,7 @@ const struct spi_flash_params spi_flash_params_table[] = {
 	{"W25Q128BV",	   0xef4018, 0x0,	64 * 1024,   256, RD_FULL | WR_QPP | SECT_4K},
 	{"W25Q256",	   0xef4019, 0x0,	64 * 1024,   512, RD_FULL | WR_QPP | SECT_4K},
 	{"W25Q256JV",	   0xef7019, 0x0,	64 * 1024,   512, RD_FULL | WR_QPP | SECT_4K},
+	{"W25Q512JVF",	   0xef4020, 0x0,	64 * 1024,   1024, RD_FULL | WR_QPP | SECT_4K},
 	{"W25Q80BW",	   0xef5014, 0x0,	64 * 1024,    16, RD_FULL | WR_QPP | SECT_4K},
 	{"W25Q16DW",	   0xef6015, 0x0,	64 * 1024,    32, RD_FULL | WR_QPP | SECT_4K},
 	{"W25Q32DW",	   0xef6016, 0x0,	64 * 1024,    64, RD_FULL | WR_QPP | SECT_4K},
@@ -160,6 +161,7 @@ const struct spi_flash_params spi_flash_params_table[] = {
 	{"W25M02GV",	   0xefab21, 0x0,	64 * 2048,  2048, RD_FULL | WR_QPP | SECT_4K},
 	{"GD5F1GQ4xExxG",  0xc8d1c8, 0x0,       64 * 2048,  1024, RD_FULL | WR_QPP | SECT_4K},  //suppurt GD & WB in one uboot
 	{"GD5F1GQ5xExxG",  0xc851c8, 0x0,       64 * 2048,  1024, RD_FULL | WR_QPP | SECT_4K},  //suppurt GD & WB in one uboot
+	{"GD5F2GQ5xExxG",  0xc852c8, 0x0,       64 * 2048,  2048, RD_FULL | WR_QPP | SECT_4K},
 	{"TC58CVG0S3HRAIJ",0x98e240, 0x0,       64 * 2048,  1024, RD_FULL | WR_QPP | SECT_4K},  //suppurt GD & WB & KIOXIA in one uboot
 	{"FM25S01A",  	   0xa1e47f, 0x0,       64 * 2048,  1024, RD_FULL | WR_QPP | SECT_4K},	//suppurt GD & WB & KIOXIA & FM25 in one uboot
 	{"S35ML04G03", 	   0x013501, 0x0,       64 * 2048,  2048, RD_FULL | WR_QPP | SECT_4K},

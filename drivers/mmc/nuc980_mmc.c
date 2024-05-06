@@ -155,13 +155,13 @@ int nuc980_sd_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *da
 				                   ((tmp[i + 1] & 0xff000000) >> 24);
 		} else {
 			while (1) {
-				if (!(readl(REG_SDCSR) & RI_EN))
-					break;
 				if (readl(REG_SDISR) & RITO_IF) {
 					writel(RITO_IF, REG_SDISR);
 					writel(0, REG_SDTMOUT);
 					return(-ETIMEDOUT);
 				}
+				if (!(readl(REG_SDCSR) & RI_EN))
+					break;
 			}
 			//printf("=>%x %x %x %x\n", sdcsr, readl(REG_SDBLEN), readl(REG_SDRSP0), readl(REG_SDRSP1));
 			//printf("[xxxx]REG_SDISR = 0x%x\n",readl(REG_SDISR));
@@ -278,6 +278,9 @@ int nuc980_emmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *
 	//printf("arg: %x\n", cmd->cmdarg);
 	writel(emmcctl, REG_EMMCCTL);
 	udelay(300);
+	if(cmd->cmdarg==55)
+		mdelay(1);
+
 	while (readl(REG_EMMCCTL) & CO_EN); //wait 'til command out complete
 
 	if(mmc_resp_type(cmd) != MMC_RSP_NONE) {
@@ -294,13 +297,13 @@ int nuc980_emmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *
 				                   ((tmp[i + 1] & 0xff000000) >> 24);
 		} else {
 			while (1) {
-				if (!(readl(REG_EMMCCTL) & RI_EN))
-					break;
 				if (readl(REG_EMMCINTSTS) & RITO_IF) {
 					writel(RITO_IF, REG_EMMCINTSTS);
 					writel(0, REG_EMMCTOUT);
 					return(-ETIMEDOUT);
 				}
+				if (!(readl(REG_EMMCCTL) & RI_EN))
+					break;
 			}
 			//printf("=>%x %x %x %x\n", emmcctl, readl(REG_EMMCBLEN), readl(REG_EMMCRESP0), readl(REG_EMMCRESP1));
 			//printf("[xxxx]REG_EMMCINTSTS = 0x%x\n",readl(REG_EMMCINTSTS));
